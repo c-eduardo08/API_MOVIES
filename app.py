@@ -51,19 +51,29 @@ def obter_filme_id(filme_id: int):
     return JSONResponse(content={"mensagem": "Filme não encontrado"}, status_code=404)
 
 # Editar - Edit
-@app.put("/filmes/add/{i}")
-def editar_filme_id(i:int, titulo: Optional[str]= None, diretor: Optional[str]= None, ano: Optional[int]= None):
-    for filme in filmes:
-        if filme[id] == i:
-            if titulo:
-                filme['titulo'] = titulo
-            if diretor:
-                filme['Diretor'] = diretor
-            if ano:
-                filme['Ano'] = ano
-            return {"mensagem": "Filme editado com sucesso!"}
-        
-    return JSONResponse(content={"mensagem": "Filme&ID não encontrado!"})
+@app.put("/filmes/add/{filme_id}")
+def editar_filme_id(filme_id:int, filme_alterado: dict):
+    for index, filme in enumerate(filmes):
+            if filme.get('id') == filme_id:
+                filmes[index].update(filme_alterado)
+                return filmes[index]
+            
+            
+    return {"mensagem": "Filme não encontrado!"}
+
+
+# Criar filme
+@app.post("/filmes/adc")
+def criar_filme(filme: dict):
+    novo_id = len(filmes) + 1
+    novo_filme = {
+        'id': novo_id,
+        'titulo': filme.get('titulo'),
+        'Diretor': filme.get('diretor'),
+        'Ano': filme.get('ano')
+    }
+    filmes.append(novo_filme)
+    return JSONResponse(content={"mensagem": "Filme adicionado com sucesso", "filme": novo_filme}, status_code=200)
 
 
 
@@ -71,7 +81,7 @@ def editar_filme_id(i:int, titulo: Optional[str]= None, diretor: Optional[str]= 
 @app.delete("/filmes/{d}")
 def excluir_filme(d: int):
     for index, filme in enumerate(filmes):
-        if filme.get(id) == d:
+        if filme.get('id') == d:
             del filmes[index]
 
     return JSONResponse(content=filmes)
